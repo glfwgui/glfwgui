@@ -426,6 +426,7 @@ GLFWAPI int glfwInit(void)
     _glfw.initialized = GLFW_TRUE;
 
     glfwDefaultWindowHints();
+    _glfwGuiInit();
     return GLFW_TRUE;
 }
 

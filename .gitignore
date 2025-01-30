@@ -27,7 +27,7 @@ GLFW.xcodeproj
 .DS_Store
 
 # Makefile generator clutter
-Makefile
+#Makefile
 
 # Ninja generator clutter
 build.ninja
@@ -102,3 +102,4 @@ tests/triangle-vulkan
 tests/window
 tests/windows
 
+compile_commands.json

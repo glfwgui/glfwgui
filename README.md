@@ -1,3 +1,21 @@
+### GLFWGUI NOTE BEGIN
+GLFWGUI is [glfw](https://github.com/glfw/glfw/) backward compatible fork.<br />
+The main goal is support common native gui widgets such as:
+1. context/application menu.
+2. modal dialogs such as open/save files, messagebox.
+3. color/font picker.
+
+WARNING !!! For now project is not usable yet.
+
+Current develepment state:<br />
+|                  | MENU | OPEN/SAVE | MESSAGEBOX | COLOR_PICKER | FONT_PICKER |
+| ---------------- | ---- | --------- | ---------- | ------------ | ----------- |
+| APPLE/COCOA      | 💛 | ❤️ | ❤️ | ❤️ | ❤️ |
+| WINDOWS/WIN32API | ❤️ | ❤️ | ❤️ | ❤️ | ❤️ |
+| LINUX/UNIX/GTK   | ❤️ | ❤️ | ❤️ | ❤️ | ❤️ |
+<!-- 💚 -->
+### GLFWGUI NOTE END
+##
 # GLFW
 
 [![Build status](https://github.com/glfw/glfw/actions/workflows/build.yml/badge.svg)](https://github.com/glfw/glfw/actions)

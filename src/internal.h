@@ -47,6 +47,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include "../include/GLFW/glfw3.h"
+#include "../include/GLFW/glfw3gui.h"
 
 #include <stdbool.h>
 
@@ -1019,4 +1020,11 @@ int _glfw_max(int a, int b);
 void* _glfw_calloc(size_t count, size_t size);
 void* _glfw_realloc(void* pointer, size_t size);
 void _glfw_free(void* pointer);
+
+
+//////////////////////////////////////////////////////////////////////////
+//////                         GLFWGUI API                          //////
+//////////////////////////////////////////////////////////////////////////
+
+void _glfwGuiInit(void);
 

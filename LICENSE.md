@@ -2,6 +2,8 @@ Copyright (c) 2002-2006 Marcus Geelnard
 
 Copyright (c) 2006-2019 Camilla Löwy
 
+Copyright (c) 2025 Pawel Plociennik (github.com/pawplo)
+
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
 arising from the use of this software.
