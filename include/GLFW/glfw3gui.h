@@ -39,12 +39,14 @@ typedef void GLFWGUImenuitem;
 GLFWGUImenu *glfwGuiGetApplicationMenu(GLFWwindow *window);
 
 GLFWGUImenu *glfwGuiNewMenu(const char *name);
-GLFWGUImenuitem *glfwGuiAppendMenuItem(GLFWGUImenu *menu, const char *name, int key_mods, const char key_shortcut,
+GLFWGUImenuitem *glfwGuiAppendMenuItem(GLFWGUImenu *menu, const char *name, int key_mods, char key_shortcut,
                                     void (*callback)(GLFWGUImenuitem *, void *), void *callback_data);
 
 GLFWGUImenu *glfwGuiAppendSubMenu(GLFWGUImenu *menu, const char *name);
 
 void glfwGuiPopUpMenu(GLFWwindow *w, GLFWGUImenu *menu);
+
+void glfwGuiMenuItemKeyShortcutProcess(int key_mods, char key_shortcut);
 
 /*************************************************************************
  * GLFWGUI MESAGEBOX DIALOG

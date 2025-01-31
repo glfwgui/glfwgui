@@ -49,6 +49,25 @@ int window_xpos, window_ypos;
 
 static vec3 color = {1.0f, 0.0f, 0.0f};
 
+enum color {
+    RED,
+    YELLOW,
+    GREEN,
+    CYAN,
+    BLUE,
+    MAGENTA,
+    COLOR_MAX
+};
+
+static const vec3 colors[COLOR_MAX] = {
+    {1.0f, 0.0f, 0.0f},
+    {1.0f, 1.0f, 0.0f},
+    {0.0f, 1.0f, 0.0f},
+    {0.0f, 1.0f, 1.0f},
+    {0.0f, 0.0f, 1.0f},
+    {1.0f, 0.0f, 1.0f},
+};
+
 static const char* vertex_shader_text =
 "#version 330\n"
 "uniform mat4 MVP;\n"
@@ -67,6 +86,8 @@ static const char* fragment_shader_text =
 "    fragment = vec4(uCol, 0.3);\n"
 "}\n";
 
+GLint ucol_location;
+
 GLFWGUImenu *menu;
 
 static void error_callback(int error, const char* description)
@@ -78,6 +99,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    if (action == GLFW_PRESS) {
+        glfwGuiMenuItemKeyShortcutProcess(mods, key);
+    }
+
 }
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -105,6 +131,20 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 void menu_callback(GLFWGUImenuitem *item, void *callback_data)
 {
     printf("menu_callback [%s]\n", (char *)callback_data);
+
+    if (strcmp(callback_data, "red") == 0) {
+        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[RED]);
+    } else if (strcmp(callback_data, "green") == 0) {
+        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[GREEN]);
+    } else if (strcmp(callback_data, "blue") == 0) {
+        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[BLUE]);
+    } else if (strcmp(callback_data, "yellow") == 0) {
+        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[YELLOW]);
+    } else if (strcmp(callback_data, "cyan") == 0) {
+        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[CYAN]);
+    } else if (strcmp(callback_data, "magenta") == 0) {
+        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[MAGENTA]);
+    }
 }
 
 int main(void)
@@ -129,32 +169,26 @@ int main(void)
 
     glfwGetWindowPos(window, &window_xpos, &window_ypos);
 
-////////////////
 
-    menu = glfwGuiNewMenu("popmenu");
+    menu = glfwGuiNewMenu("colors");
 
-    glfwGuiAppendMenuItem(menu, "1111", GLFW_MOD_SHIFT, 'a', menu_callback, "1111");
-    glfwGuiAppendMenuItem(menu, "2222", GLFW_MOD_CONTROL, 'b', menu_callback, "2222");
+    glfwGuiAppendMenuItem(menu, "red", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'r', menu_callback, "red");
+    glfwGuiAppendMenuItem(menu, "green", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'g', menu_callback, "green");
 
     GLFWGUImenu *submenu = glfwGuiAppendSubMenu(menu, "submenu");
-    glfwGuiAppendMenuItem(submenu, "3333", GLFW_MOD_ALT, 'c', menu_callback, "3333");
-    glfwGuiAppendMenuItem(submenu, "4444", GLFW_MOD_SUPER, 'd', menu_callback, "4444");
+    glfwGuiAppendMenuItem(submenu, "blue", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'b', menu_callback, "blue");
 
-////////////////
 
     GLFWGUImenu *appmenu = glfwGuiGetApplicationMenu(window);
 
-    GLFWGUImenu *menu2 = glfwGuiAppendSubMenu(appmenu, "qwerty");
+    GLFWGUImenu *menu2 = glfwGuiAppendSubMenu(appmenu, "colors");
 
-    glfwGuiAppendMenuItem(menu2, "5555", GLFW_MOD_SHIFT, 'e', menu_callback, "5555");
-    glfwGuiAppendMenuItem(menu2, "6666", GLFW_MOD_CONTROL, 'f', menu_callback, "6666");
+    glfwGuiAppendMenuItem(menu2, "yellow", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'y', menu_callback, "yellow");
+    glfwGuiAppendMenuItem(menu2, "cyan", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'c', menu_callback, "cyan");
 
     GLFWGUImenu *submenu2 = glfwGuiAppendSubMenu(menu2, "submenu");
-    glfwGuiAppendMenuItem(submenu2, "7777", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL, 'g', menu_callback, "7777");
-    glfwGuiAppendMenuItem(submenu2, "8888", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT, 'h', menu_callback, "8888");
-    glfwGuiAppendMenuItem(submenu2, "9999", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'i', menu_callback, "9999");
+    glfwGuiAppendMenuItem(submenu2, "magenta", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'm', menu_callback, "magenta");
 
-////////////////
 
     glfwSetKeyCallback(window, key_callback);
 
@@ -162,10 +196,6 @@ int main(void)
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
 
-//glEnable(GL_BLEND);
-//glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-
-    // NOTE: OpenGL error checks have been omitted for brevity
 
     GLuint vertex_buffer;
     glGenBuffers(1, &vertex_buffer);
@@ -187,7 +217,7 @@ int main(void)
 
     const GLint mvp_location = glGetUniformLocation(program, "MVP");
     const GLint vpos_location = glGetAttribLocation(program, "vPos");
-    const GLint ucol_location = glGetUniformLocation(program, "uCol");
+    ucol_location = glGetUniformLocation(program, "uCol");
 
     GLuint vertex_array;
     glGenVertexArrays(1, &vertex_array);

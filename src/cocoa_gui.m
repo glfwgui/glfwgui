@@ -84,7 +84,7 @@ GLFWGUImenu *glfwGuiNewMenu(const char *name)
     return (GLFWGUImenu *)[[NSMenu alloc] initWithTitle:[NSString stringWithUTF8String:(name)]];
 }
 
-GLFWGUImenuitem *glfwGuiAppendMenuItem(GLFWGUImenu *menu, const char *name, int key_mods, const char key_shortcut,
+GLFWGUImenuitem *glfwGuiAppendMenuItem(GLFWGUImenu *menu, const char *name, int key_mods, char key_shortcut,
                                     void (*callback)(GLFWGUImenuitem *, void *), void *callback_data)
 {
     NSMenuItem *item = [GLFWGUINSTANCE glfwGuiAppendMenuItem:(NSMenu *)menu
@@ -131,6 +131,20 @@ void glfwGuiPopUpMenu(GLFWwindow *window, GLFWGUImenu *menu)
 {
     NSWindow *ns_window = glfwGetCocoaWindow(window);
     [(NSMenu *)menu popUpMenuPositioningItem:nil atLocation:[ns_window convertPointFromScreen:[NSEvent mouseLocation]] inView:[ns_window contentView]];
+}
+
+void glfwGuiMenuItemKeyShortcutProcess(int key_mods, char key_shortcut)
+{
+    if (key_shortcut >= 'A' && key_shortcut <= 'Z') {
+        key_shortcut += 'z' - 'Z';
+    }
+    for (int i = 0; i < maps_index; i++) {
+        if (maps[i].key_mods == key_mods && maps[i].key_shortcut == key_shortcut) {
+            if (maps[i].callback) {
+                maps[i].callback(maps[i].item ,maps[i].callback_data);
+            }
+        }
+    }
 }
 
 #endif
