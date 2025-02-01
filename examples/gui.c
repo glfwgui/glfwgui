@@ -23,7 +23,6 @@
 //    distribution.
 //
 //========================================================================
-//! [code]
 
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/gl.h>
@@ -43,9 +42,6 @@ static const vec2 vertices[3] =
     {  0.6f, -0.4f },
     {  0.0f,  0.6f }
 };
-
-static int cursor_xpos, cursor_ypos;
-int window_xpos, window_ypos;
 
 static vec3 color = {1.0f, 0.0f, 0.0f};
 
@@ -113,21 +109,6 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     }
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-//    window_xpos += (xoffset * 4.0);
-//    window_ypos += (yoffset * 4.0);
-//    glfwSetWindowPos(window, window_xpos, window_ypos);
-}
-
-static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
-{
-//    cursor_xpos = (int)xpos;
-//    cursor_ypos = (int)ypos;
-//    printf("x=%d y=%d\n", cursor_xpos, cursor_ypos);
-//    glfwSetWindowPos(window, cursor_xpos, cursor_ypos);
-}
-
 void menu_callback(GLFWGUImenuitem *item, void *callback_data)
 {
     printf("menu_callback [%s]\n", (char *)callback_data);
@@ -157,8 +138,6 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
-//    glfwWindowHint( GLFW_DECORATED, GLFW_FALSE);
 
     GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Triangle", NULL, NULL);
     if (!window)
@@ -166,9 +145,6 @@ int main(void)
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-
-    glfwGetWindowPos(window, &window_xpos, &window_ypos);
-
 
     menu = glfwGuiNewMenu("colors");
 
@@ -189,13 +165,11 @@ int main(void)
     GLFWGUImenu *submenu2 = glfwGuiAppendSubMenu(menu2, "submenu");
     glfwGuiAppendMenuItem(submenu2, "magenta", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'm', menu_callback, "magenta");
 
-
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
-
 
     GLuint vertex_buffer;
     glGenBuffers(1, &vertex_buffer);
@@ -227,12 +201,9 @@ int main(void)
                           0, 0);
 
     glUseProgram(program);
-
     glUniform3fv(ucol_location, 1, (const GLfloat*) &color);
 
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
-    glfwSetScrollCallback(window, scroll_callback);
 
     float angle = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -264,5 +235,3 @@ int main(void)
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
-
-//! [code]
