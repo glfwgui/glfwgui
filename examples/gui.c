@@ -36,14 +36,18 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#define _1_2_MUL_SQRT_3_DIV_6 0.346410161513775f
+#define _1_2_MUL_SQRT_3_DIV_3 0.692820323027551f
+
 static const vec2 vertices[3] =
 {
-    { -0.6f, -0.4f },
-    {  0.6f, -0.4f },
-    {  0.0f,  0.6f }
+    { -0.6f, -_1_2_MUL_SQRT_3_DIV_6 },
+    {  0.6f, -_1_2_MUL_SQRT_3_DIV_6 },
+    {  0.0f,  _1_2_MUL_SQRT_3_DIV_3 }
 };
 
-static vec3 color = {1.0f, 0.0f, 0.0f};
+static const vec4 red_color = {1.0f, 0.0f, 0.0f, 0.5f};
+static vec4 color = {1.0f, 0.0f, 0.0f, 0.5f};
 
 enum color {
     RED,
@@ -55,13 +59,24 @@ enum color {
     COLOR_MAX
 };
 
-static const vec3 colors[COLOR_MAX] = {
-    {1.0f, 0.0f, 0.0f},
-    {1.0f, 1.0f, 0.0f},
-    {0.0f, 1.0f, 0.0f},
-    {0.0f, 1.0f, 1.0f},
-    {0.0f, 0.0f, 1.0f},
-    {1.0f, 0.0f, 1.0f},
+static char *color_names[COLOR_MAX] = {
+    "red",
+    "yellow",
+    "green",
+    "cyan",
+    "blue",
+    "magenta"
+};
+
+vec4 *color_ptr = (vec4*)&red_color;
+
+static const vec4 colors[COLOR_MAX] = {
+    {1.0f, 0.0f, 0.0f, 0.5f},
+    {1.0f, 1.0f, 0.0f, 0.5f},
+    {0.0f, 1.0f, 0.0f, 0.5f},
+    {0.0f, 1.0f, 1.0f, 0.5f},
+    {0.0f, 0.0f, 1.0f, 0.5f},
+    {1.0f, 0.0f, 1.0f, 0.5f},
 };
 
 static const char* vertex_shader_text =
@@ -75,11 +90,11 @@ static const char* vertex_shader_text =
 
 static const char* fragment_shader_text =
 "#version 330\n"
-"uniform vec3 uCol;\n"
+"uniform vec4 uCol;\n"
 "out vec4 fragment;\n"
 "void main()\n"
 "{\n"
-"    fragment = vec4(uCol, 0.3);\n"
+"    fragment = vec4(uCol);\n"
 "}\n";
 
 int width=800;
@@ -94,18 +109,26 @@ GLFWwindow* window;
 float ratio = 1.0f;
 float angle = 0.0f;
 
+mat4x4 mi, m, p, mvp;
+
 void render(void)
 {
         glClear(GL_COLOR_BUFFER_BIT);
-        mat4x4 m, p, mvp;
-        mat4x4_identity(m);
-        mat4x4_rotate_Z(m, m, angle);
-        angle += 0.02f;
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+
+        glUniform4fv(ucol_location, 1, (const GLfloat*)red_color);
+        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &p);
+        //glBindVertexArray(vertex_array);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
+        mat4x4_rotate_Z(m, mi, angle);
+
+        angle += 0.01f;
         mat4x4_mul(mvp, p, m);
 
+        glUniform4fv(ucol_location, 1, (const GLfloat*)color_ptr);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
-        glBindVertexArray(vertex_array);
+        //glBindVertexArray(vertex_array);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
@@ -124,7 +147,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (action == GLFW_PRESS) {
         glfwGuiMenuItemKeyShortcutProcess(mods, key);
     }
-
 }
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -137,7 +159,8 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 void color_picker_callback(float rgba[4])
 {
 //    printf("%d %d %d %d\n", r, g, b, a);
-    glUniform3fv(ucol_location, 1, (const GLfloat*)rgba);
+    memcpy(color, rgba, 4 * sizeof(float));
+    color_ptr = (vec4*)&color;
     render();
 }
 
@@ -146,19 +169,14 @@ void menu_callback(GLFWGUImenuitem *item, void *callback_data)
     printf("menu_callback [%s]\n", (char *)callback_data);
 
     if (strcmp(callback_data, "color picker") == 0) {
-        glfwGuiColorPicker(&color_picker_callback);
-    } else if (strcmp(callback_data, "red") == 0) {
-        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[RED]);
-    } else if (strcmp(callback_data, "green") == 0) {
-        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[GREEN]);
-    } else if (strcmp(callback_data, "blue") == 0) {
-        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[BLUE]);
-    } else if (strcmp(callback_data, "yellow") == 0) {
-        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[YELLOW]);
-    } else if (strcmp(callback_data, "cyan") == 0) {
-        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[CYAN]);
-    } else if (strcmp(callback_data, "magenta") == 0) {
-        glUniform3fv(ucol_location, 1, (const GLfloat*)colors[MAGENTA]);
+        glfwGuiColorPicker((float*)color_ptr, &color_picker_callback);
+    } else {
+        for (int i = 0; i < COLOR_MAX; i++) {
+            if (strcmp(callback_data, color_names[i]) == 0) {
+                color_ptr = (vec4*)&colors[i];
+                return;
+            }
+        }
     }
 }
 
@@ -166,6 +184,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     ratio = width / (float) height;
+    mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
 }
 
 int main(void)
@@ -240,9 +259,13 @@ int main(void)
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
                           0, 0);
 
-    glUseProgram(program);
-    glUniform3fv(ucol_location, 1, (const GLfloat*) &color);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glUseProgram(program);
+    glUniform4fv(ucol_location, 1, (const GLfloat*)&color);
+
+    mat4x4_identity(mi);
     framebuffer_size_callback(window, width, height);
 
     glfwSetMouseButtonCallback(window, mouse_button_callback);

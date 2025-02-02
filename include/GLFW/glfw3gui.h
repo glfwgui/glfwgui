@@ -60,6 +60,6 @@ void glfwGuiMenuItemKeyShortcutProcess(int key_mods, char key_shortcut);
  * GLFWGUI COLOR PICKER DIALOG
  *************************************************************************/
 
-void glfwGuiColorPicker(void (*color_picker_callback)(float rgba[4]));
+void glfwGuiColorPicker(float rgba[4], void (*color_picker_callback)(float rgba[4]));
 
 #endif /* __GLFW3GUI_H */

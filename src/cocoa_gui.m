@@ -47,7 +47,7 @@ static GLfloat color_picker[4];
 @interface GLFWGUI : NSObject
 - (void)menu_action:(id)sender;
 - (NSMenuItem *)glfwGuiAppendMenuItem:(NSMenu *)menu NSString:name NSString:key_shortcut;
-- (void) glfwGuiColorPicker;
+- (void) glfwGuiColorPicker:(float [4])rgba;
 - (void)changeColor:(id)sender;
 @end
 
@@ -71,7 +71,7 @@ static GLfloat color_picker[4];
     return item;
 }
 
-- (void) glfwGuiColorPicker {
+- (void) glfwGuiColorPicker:(float [4])rgba {
   [NSColorPanel setPickerMask:NSColorPanelRGBModeMask |
                               NSColorPanelCrayonModeMask |
                               NSColorPanelCustomPaletteModeMask |
@@ -81,7 +81,9 @@ static GLfloat color_picker[4];
   ];
 
   NSColorPanel* colorDialog = [NSColorPanel sharedColorPanel];
+  [colorDialog setShowsAlpha:YES];
   [colorDialog setIsVisible:YES];
+  [colorDialog setColor:[NSColor colorWithSRGBRed:rgba[0] green:rgba[1] blue:rgba[2] alpha:rgba[3]]];
   [colorDialog setAction:@selector(changeColor:)];
   [colorDialog setTarget:self];
 }
@@ -180,10 +182,10 @@ void glfwGuiMenuItemKeyShortcutProcess(int key_mods, char key_shortcut)
     }
 }
 
-void glfwGuiColorPicker(void (*color_picker_callback)(float rgba[4]))
+void glfwGuiColorPicker(float rgba[4], void (*color_picker_callback)(float rgba[4]))
 {
     _color_picker_callback = color_picker_callback;
-    [GLFWGUINSTANCE glfwGuiColorPicker];
+    [GLFWGUINSTANCE glfwGuiColorPicker:rgba];
 }
 
 #endif
