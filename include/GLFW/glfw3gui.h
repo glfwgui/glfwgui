@@ -52,6 +52,14 @@ void glfwGuiMenuItemKeyShortcutProcess(int key_mods, char key_shortcut);
  * GLFWGUI MESAGEBOX DIALOG
  *************************************************************************/
 
+typedef enum GLFWGUImessageboxstyle {
+    GLFWGUI_MESSAGEBOX_INFO_STYLE,
+    GLFWGUI_MESSAGEBOX_WARNING_STYLE,
+    GLFWGUI_MESSAGEBOX_ERROR_STYLE,
+} GLFWGUImessageboxstyle;
+
+int glfwGuiMessageBox(GLFWwindow  *window, GLFWGUImessageboxstyle style, const char *title, const char *text, const char *button_name, const char *button_name2, const char *button_names3);
+
 /*************************************************************************
  * GLFWGUI OPEN/SAVE DIALOG
  *************************************************************************/

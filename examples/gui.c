@@ -68,8 +68,6 @@ static char *color_names[COLOR_MAX] = {
     "magenta"
 };
 
-vec4 *color_ptr = (vec4*)&red_color;
-
 static const vec4 colors[COLOR_MAX] = {
     {1.0f, 0.0f, 0.0f, 0.5f},
     {1.0f, 1.0f, 0.0f, 0.5f},
@@ -78,6 +76,8 @@ static const vec4 colors[COLOR_MAX] = {
     {0.0f, 0.0f, 1.0f, 0.5f},
     {1.0f, 0.0f, 1.0f, 0.5f},
 };
+
+vec4 *color_ptr = (vec4*)&colors[YELLOW];
 
 static const char* vertex_shader_text =
 "#version 330\n"
@@ -173,7 +173,10 @@ void menu_callback(GLFWGUImenuitem *item, void *callback_data)
     } else {
         for (int i = 0; i < COLOR_MAX; i++) {
             if (strcmp(callback_data, color_names[i]) == 0) {
-                color_ptr = (vec4*)&colors[i];
+                int bi = glfwGuiMessageBox(window, GLFWGUI_MESSAGEBOX_INFO_STYLE, "Change color ?", callback_data, "YES", "NO", NULL);
+                printf("i=%d\n", bi);
+                if (bi == 0)
+                    color_ptr = (vec4*)&colors[i];
                 return;
             }
         }

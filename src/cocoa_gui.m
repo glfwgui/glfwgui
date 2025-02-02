@@ -188,4 +188,26 @@ void glfwGuiColorPicker(float rgba[4], void (*color_picker_callback)(float rgba[
     [GLFWGUINSTANCE glfwGuiColorPicker:rgba];
 }
 
+
+int glfwGuiMessageBox(GLFWwindow  *window, GLFWGUImessageboxstyle style, const char *title, const char *text,  const char *button_name, const char *button_name2, const char *button_name3)
+{
+    NSWindow *ns_window = glfwGetCocoaWindow(window);
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:[NSString stringWithUTF8String:(title)]];
+    [alert setInformativeText:[NSString stringWithUTF8String:(text)]];
+    if (style == GLFWGUI_MESSAGEBOX_INFO_STYLE) {
+    [alert setAlertStyle:NSAlertStyleInformational];
+    } else if (style == GLFWGUI_MESSAGEBOX_WARNING_STYLE) {
+    [alert setAlertStyle:NSAlertStyleWarning];
+    } else if (style == GLFWGUI_MESSAGEBOX_ERROR_STYLE) {
+    [alert setAlertStyle:NSAlertStyleCritical];
+    }
+
+    if (button_name) [alert addButtonWithTitle:[NSString stringWithUTF8String:(button_name)]];
+    if (button_name2) [alert addButtonWithTitle:[NSString stringWithUTF8String:(button_name2)]];
+    if (button_name3) [alert addButtonWithTitle:[NSString stringWithUTF8String:(button_name3)]];
+
+    return [alert runModal] - NSAlertFirstButtonReturn;
+}
+
 #endif
