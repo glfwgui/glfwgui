@@ -82,9 +82,34 @@ static const char* fragment_shader_text =
 "    fragment = vec4(uCol, 0.3);\n"
 "}\n";
 
+int width=800;
+int height=600;
+GLuint vertex_array;
+GLint mvp_location;
 GLint ucol_location;
 
 GLFWGUImenu *menu;
+
+GLFWwindow* window;
+float ratio = 1.0f;
+float angle = 0.0f;
+
+void render(void)
+{
+        glClear(GL_COLOR_BUFFER_BIT);
+        mat4x4 m, p, mvp;
+        mat4x4_identity(m);
+        mat4x4_rotate_Z(m, m, angle);
+        angle += 0.02f;
+        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+        mat4x4_mul(mvp, p, m);
+
+        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
+        glBindVertexArray(vertex_array);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glfwSwapBuffers(window);
+}
 
 static void error_callback(int error, const char* description)
 {
@@ -109,11 +134,20 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     }
 }
 
+void color_picker_callback(float rgba[4])
+{
+//    printf("%d %d %d %d\n", r, g, b, a);
+    glUniform3fv(ucol_location, 1, (const GLfloat*)rgba);
+    render();
+}
+
 void menu_callback(GLFWGUImenuitem *item, void *callback_data)
 {
     printf("menu_callback [%s]\n", (char *)callback_data);
 
-    if (strcmp(callback_data, "red") == 0) {
+    if (strcmp(callback_data, "color picker") == 0) {
+        glfwGuiColorPicker(&color_picker_callback);
+    } else if (strcmp(callback_data, "red") == 0) {
         glUniform3fv(ucol_location, 1, (const GLfloat*)colors[RED]);
     } else if (strcmp(callback_data, "green") == 0) {
         glUniform3fv(ucol_location, 1, (const GLfloat*)colors[GREEN]);
@@ -128,6 +162,12 @@ void menu_callback(GLFWGUImenuitem *item, void *callback_data)
     }
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    ratio = width / (float) height;
+}
+
 int main(void)
 {
     glfwSetErrorCallback(error_callback);
@@ -139,7 +179,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Triangle", NULL, NULL);
+    window = glfwCreateWindow(width, height, "OpenGL Triangle", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -148,6 +188,7 @@ int main(void)
 
     menu = glfwGuiNewMenu("colors");
 
+    glfwGuiAppendMenuItem(menu, "color picker", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'p', menu_callback, "color picker");
     glfwGuiAppendMenuItem(menu, "red", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'r', menu_callback, "red");
     glfwGuiAppendMenuItem(menu, "green", GLFW_MOD_SHIFT|GLFW_MOD_CONTROL|GLFW_MOD_ALT|GLFW_MOD_SUPER, 'g', menu_callback, "green");
 
@@ -189,11 +230,10 @@ int main(void)
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
 
-    const GLint mvp_location = glGetUniformLocation(program, "MVP");
+    mvp_location = glGetUniformLocation(program, "MVP");
     const GLint vpos_location = glGetAttribLocation(program, "vPos");
     ucol_location = glGetUniformLocation(program, "uCol");
 
-    GLuint vertex_array;
     glGenVertexArrays(1, &vertex_array);
     glBindVertexArray(vertex_array);
     glEnableVertexAttribArray(vpos_location);
@@ -203,30 +243,14 @@ int main(void)
     glUseProgram(program);
     glUniform3fv(ucol_location, 1, (const GLfloat*) &color);
 
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    framebuffer_size_callback(window, width, height);
 
-    float angle = 0.0f;
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
     while (!glfwWindowShouldClose(window))
     {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        const float ratio = width / (float) height;
-
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        mat4x4 m, p, mvp;
-        mat4x4_identity(m);
-        mat4x4_rotate_Z(m, m, angle);
-        angle += 0.02f;
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        mat4x4_mul(mvp, p, m);
-
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
-        glBindVertexArray(vertex_array);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glfwSwapBuffers(window);
+        render();
         glfwPollEvents();
     }
 

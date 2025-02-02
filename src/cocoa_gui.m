@@ -41,14 +41,20 @@ struct menuitem {
 static struct menuitem maps[256];
 int maps_index = 0;
 
+static void (*_color_picker_callback)(float rgba[4]);
+static GLfloat color_picker[4];
+
 @interface GLFWGUI : NSObject
+- (void)menu_action:(id)sender;
+- (NSMenuItem *)glfwGuiAppendMenuItem:(NSMenu *)menu NSString:name NSString:key_shortcut;
+- (void) glfwGuiColorPicker;
+- (void)changeColor:(id)sender;
 @end
 
 @implementation GLFWGUI
 
 - (void)menu_action:(id)sender
 {
-//    NSLog(@"menu_action");
     for (int i = 0; i < maps_index; i++) {
         if (maps[i].item == (NSMenuItem *)sender) {
             if (maps[i].callback) {
@@ -63,6 +69,33 @@ int maps_index = 0;
     NSMenuItem *item = [(NSMenu *)menu addItemWithTitle:name action:@selector(menu_action:) keyEquivalent:key_shortcut];
     [item setTarget:self];
     return item;
+}
+
+- (void) glfwGuiColorPicker {
+  [NSColorPanel setPickerMask:NSColorPanelRGBModeMask |
+                              NSColorPanelCrayonModeMask |
+                              NSColorPanelCustomPaletteModeMask |
+                              NSColorPanelWheelModeMask |
+                              NSColorPanelCrayonModeMask
+
+  ];
+
+  NSColorPanel* colorDialog = [NSColorPanel sharedColorPanel];
+  [colorDialog setIsVisible:YES];
+  [colorDialog setAction:@selector(changeColor:)];
+  [colorDialog setTarget:self];
+}
+
+- (void)changeColor:(id)sender {
+    if (_color_picker_callback == NULL) return;
+
+    NSColor *c = [(NSColorPanel*)sender color];
+    color_picker[0] = [c redComponent];
+    color_picker[1] = [c greenComponent];
+    color_picker[2] = [c blueComponent];
+    color_picker[3] = [c alphaComponent];
+
+    _color_picker_callback(color_picker);
 }
 
 @end // GLFWGUI
@@ -145,6 +178,12 @@ void glfwGuiMenuItemKeyShortcutProcess(int key_mods, char key_shortcut)
             }
         }
     }
+}
+
+void glfwGuiColorPicker(void (*color_picker_callback)(float rgba[4]))
+{
+    _color_picker_callback = color_picker_callback;
+    [GLFWGUINSTANCE glfwGuiColorPicker];
 }
 
 #endif

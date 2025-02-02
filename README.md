@@ -10,7 +10,7 @@ WARNING !!! For now project is not usable yet.
 Current develepment state:<br />
 |                  | MENU | OPEN/SAVE | MESSAGEBOX | COLOR_PICKER | FONT_PICKER |
 | ---------------- | ---- | --------- | ---------- | ------------ | ----------- |
-| APPLE/COCOA      | 💛 | ❤️ | ❤️ | ❤️ | ❤️ |
+| APPLE/COCOA      | 💛 | ❤️ | ❤️ | 💚 | ❤️ |
 | WINDOWS/WIN32API | ❤️ | ❤️ | ❤️ | ❤️ | ❤️ |
 | LINUX/UNIX/GTK   | ❤️ | ❤️ | ❤️ | ❤️ | ❤️ |
 <!-- 💚 -->
